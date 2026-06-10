@@ -17,7 +17,6 @@ public class CmdDeclareWar extends CmdBase {
     public CmdDeclareWar() {
         super("declarewar", Level.ALL);
     }
-
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         // Usage: /team declarewar <targetTeam>
@@ -126,7 +125,6 @@ public class CmdDeclareWar extends CmdBase {
     } else {
         whenMsg = graceSeconds + " seconds";
     }
-
     sender.addChatMessage(ServerUtilities.lang(sender,
         "War declared between your team and " + targetTeam.getId() + "! The war will become active in " + whenMsg + "."));
 

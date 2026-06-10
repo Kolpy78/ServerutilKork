@@ -24,7 +24,6 @@ public class WarManager {
     // Persistent sets to track which wars have been announced (prevents message spam)
     private final Set<String> announcedActive = new HashSet<>();
     private final Set<String> announcedEnd = new HashSet<>();
-
     // Make WarInfo public for use in commands
     public static class WarInfo {
         public long graceEndTime;
@@ -82,6 +81,18 @@ public class WarManager {
             return false;
         }
         return now >= info.graceEndTime;
+    }
+
+    public static boolean isWarActive() {
+        long now = System.currentTimeMillis();
+        for (Map<String, WarInfo> teamMap : INSTANCE.wars.values()) {
+            for (WarInfo info : teamMap.values()) {
+                if (now < info.warEndTime) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

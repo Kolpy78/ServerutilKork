@@ -59,7 +59,8 @@ public enum Mixins implements IMixins {
     DISABLE_ENDERMEN_GRIEFING(new MixinBuilder("Disable Endermen Griefing in Claimed Chunks")
             .setPhase(Phase.EARLY)
             .setApplyIf(() -> mixins.endermen)
-            .addCommonMixins("minecraft.MixinEndermanGriefing"));
+            .addCommonMixins("minecraft.MixinEndermanGriefing")),
+    DISABLE_NUKE(new MixinBuilder("Disable nukes when at war").setPhase(Phase.LATE).addCommonMixins("hbm.NukeGuardMixin"));
     // spotless:on
 
     private final MixinBuilder builder;
