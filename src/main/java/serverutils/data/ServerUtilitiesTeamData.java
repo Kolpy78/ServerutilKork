@@ -144,14 +144,14 @@ public class ServerUtilitiesTeamData extends TeamData {
     public boolean canForceChunks = false;
     private int cachedMaxClaimChunks, cachedMaxChunkloaderChunks;
     public boolean chunkloadsDecayed;
-    
+
     /** Whether this team currently has an ongoing capture attempt (prevents multiple claimants). */
     public boolean capturingInProgress = false;
 
     /**
      * Timestamp (in millis) until which this team cannot declare war again.
      */
-    public Long  warCooldownUntil = null;
+    public Long warCooldownUntil = null;
 
     ServerUtilitiesTeamData(ForgeTeam t) {
         super(t);

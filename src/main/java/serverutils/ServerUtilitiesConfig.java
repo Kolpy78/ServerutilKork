@@ -93,41 +93,41 @@ public class ServerUtilitiesConfig {
         @Config.DefaultInt(10)
         public int war_cleanup_interval_seconds;
 
-    @Config.Comment("Grace period (in seconds) after declaring war before the war becomes active.")
+        @Config.Comment("Grace period (in seconds) after declaring war before the war becomes active.")
         @Config.DefaultInt(600)
         public int war_grace_period_seconds;
-        
-    @Config.Comment("Enable automatic capture-from-edge behavior during active wars")
-    @Config.DefaultBoolean(true)
-    public boolean war_capture_enabled;
 
-    @Config.Comment("How often (in seconds) to check players for capture attempts. Default: 30")
-    @Config.DefaultInt(30)
-    public int war_capture_check_interval_seconds;
+        @Config.Comment("Enable automatic capture-from-edge behavior during active wars")
+        @Config.DefaultBoolean(true)
+        public boolean war_capture_enabled;
+
+        @Config.Comment("How often (in seconds) to check players for capture attempts. Default: 30")
+        @Config.DefaultInt(30)
+        public int war_capture_check_interval_seconds;
 
         @Config.Comment("Enable verbose debug logging for war capture checks (prints per-player checks to server log).")
         @Config.DefaultBoolean(false)
         public boolean war_capture_debug;
 
-    @Config.Comment("How long (in seconds) a player must stand in the capture spot to complete the capture. Default: 30")
-    @Config.DefaultInt(30)
-    public int war_capture_hold_seconds;
+        @Config.Comment("How long (in seconds) a player must stand in the capture spot to complete the capture. Default: 30")
+        @Config.DefaultInt(30)
+        public int war_capture_hold_seconds;
 
-    @Config.Comment("Radius (in chunks) from the center chunk that will be ceded to the capturing team. Default: 5")
-    @Config.DefaultInt(5)
-    public int war_capture_radius_chunks;
+        @Config.Comment("Radius (in chunks) from the center chunk that will be ceded to the capturing team. Default: 5")
+        @Config.DefaultInt(5)
+        public int war_capture_radius_chunks;
 
-    @Config.Comment("Minimum percentage of team members that must be online or recently active to declare war (0-100). Default: 0 (no requirement)")
-    @Config.DefaultInt(0)
-    public int war_team_active_percentage;
+        @Config.Comment("Minimum percentage of team members that must be online or recently active to declare war (0-100). Default: 0 (no requirement)")
+        @Config.DefaultInt(0)
+        public int war_team_active_percentage;
 
-    @Config.Comment("How long (in days) before a player is considered too inactive to count toward team member validation. Default: 3 days")
-    @Config.DefaultInt(3)
-    public int war_player_inactivity_days;
+        @Config.Comment("How long (in days) before a player is considered too inactive to count toward team member validation. Default: 3 days")
+        @Config.DefaultInt(3)
+        public int war_player_inactivity_days;
 
-    @Config.Comment("If false, war cannot be declared on a team with no online players (default). If true, war can be declared if enough players have logged in recently.")
-    @Config.DefaultBoolean(false)
-    public boolean war_allow_all_offline;
+        @Config.Comment("If false, war cannot be declared on a team with no online players (default). If true, war can be declared if enough players have logged in recently.")
+        @Config.DefaultBoolean(false)
+        public boolean war_allow_all_offline;
 
         @Config.Comment("Enable syncing ServerUtilities teams to the Minecraft scoreboard. Disable this if your server's scoreboard implementation causes issues.")
         @Config.DefaultBoolean(true)

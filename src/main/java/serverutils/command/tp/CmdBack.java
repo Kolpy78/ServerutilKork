@@ -9,8 +9,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import serverutils.ServerUtilities;
 import serverutils.ServerUtilitiesPermissions;
 import serverutils.data.ServerUtilitiesPlayerData;
-import serverutils.data.TeleportType;
 import serverutils.data.TeleportLog;
+import serverutils.data.TeleportType;
 import serverutils.data.WarManager;
 import serverutils.lib.command.CmdBase;
 import serverutils.lib.command.CommandUtils;
@@ -30,7 +30,7 @@ public class CmdBack extends CmdBase {
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         EntityPlayerMP player = getCommandSenderAsPlayer(sender);
         ForgePlayer p = CommandUtils.getForgePlayer(player);
-        
+
         // Block /back for players at war
         if (p.hasTeam() && !WarManager.get().getWarringTeams(p.team.getId()).isEmpty()) {
             throw ServerUtilities.error(sender, "You cannot use /back while your team is at war.");

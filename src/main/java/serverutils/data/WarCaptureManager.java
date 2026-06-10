@@ -6,13 +6,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayerMP;
+
 import serverutils.ServerUtilities;
 import serverutils.ServerUtilitiesConfig;
 import serverutils.events.chunks.ChunkModifiedEvent;
-import serverutils.data.ClaimedChunk;
-import serverutils.data.ClaimedChunks;
-import serverutils.data.WarManager;
-import serverutils.data.ServerUtilitiesTeamData;
 import serverutils.lib.data.ForgePlayer;
 import serverutils.lib.data.ForgeTeam;
 import serverutils.lib.math.ChunkDimPos;
@@ -29,6 +26,7 @@ public class WarCaptureManager {
     }
 
     public static final class CaptureInfo {
+
         public final UUID playerId;
         public final ChunkDimPos center;
         public final double startX, startY, startZ;
@@ -36,7 +34,8 @@ public class WarCaptureManager {
         public final ForgeTeam enemyTeam;
         public final ForgeTeam capturerTeam;
 
-        public CaptureInfo(UUID pid, ChunkDimPos c, double sx, double sy, double sz, long end, ForgeTeam enemy, ForgeTeam capturer) {
+        public CaptureInfo(UUID pid, ChunkDimPos c, double sx, double sy, double sz, long end, ForgeTeam enemy,
+                ForgeTeam capturer) {
             playerId = pid;
             center = c;
             startX = sx;
@@ -80,7 +79,7 @@ public class WarCaptureManager {
             // FORCE FRESH DATA FETCH: Re-fetch the player's current chunk coordinates every tick
             // This ensures we don't use stale cached data from previous ticks
             ChunkDimPos curChunk = new ChunkDimPos(ep);
-            
+
             // FORCE FRESH DATA FETCH: Re-query the claim status for this exact chunk
             // This ensures we detect when a player leaves a claimed chunk
             ClaimedChunk curClaim = ClaimedChunks.instance.getChunk(curChunk);
@@ -104,16 +103,20 @@ public class WarCaptureManager {
             // Check if at least one direction at offset contains a non-enemy chunk (unclaimed or friendly)
             // FORCE FRESH: Re-compute edge check every tick using the freshly-fetched curChunk
             boolean edgeOk = false;
-            int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+            int[][] dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 
             java.util.List<String> neighborOwners = new java.util.ArrayList<>();
             for (int i = 0; i < dirs.length; i++) {
                 int[] d = dirs[i];
-                ChunkDimPos checkPos = new ChunkDimPos(curChunk.posX + d[0]*offset, curChunk.posZ + d[1]*offset, curChunk.dim);
+                ChunkDimPos checkPos = new ChunkDimPos(
+                        curChunk.posX + d[0] * offset,
+                        curChunk.posZ + d[1] * offset,
+                        curChunk.dim);
                 ClaimedChunk c2 = ClaimedChunks.instance.getChunk(checkPos);
 
                 if (ServerUtilitiesConfig.teams.war_capture_debug) {
-                    String owner = c2 == null ? "<unclaimed>" : (c2.getTeam() == null ? "<nullTeam>" : c2.getTeam().getId());
+                    String owner = c2 == null ? "<unclaimed>"
+                            : (c2.getTeam() == null ? "<nullTeam>" : c2.getTeam().getId());
                     neighborOwners.add(owner);
                 }
 
@@ -139,8 +142,18 @@ public class WarCaptureManager {
                         if (i > 0) nb.append(",");
                         nb.append(neighborOwners.get(i));
                     }
-                    String msg = "[WarCapture] " + fp.getName() + " at " + curChunk + " warActive=" + warActive + " edgeOk=" + edgeOk + " neighbors=" + nb.toString();
-                    try { ep.addChatMessage(ServerUtilities.lang(ep, msg)); } catch (Exception ignored) {}
+                    String msg = "[WarCapture] " + fp.getName()
+                            + " at "
+                            + curChunk
+                            + " warActive="
+                            + warActive
+                            + " edgeOk="
+                            + edgeOk
+                            + " neighbors="
+                            + nb.toString();
+                    try {
+                        ep.addChatMessage(ServerUtilities.lang(ep, msg));
+                    } catch (Exception ignored) {}
                 } catch (Exception ignored) {}
             }
 
@@ -151,25 +164,55 @@ public class WarCaptureManager {
                 CaptureInfo existing = active.get(fp.getId());
                 if (existing == null || !existing.center.equalsChunkDimPos(curChunk)) {
                     long end = now + (long) holdSec * 1000L;
-                    String initMsg = "[WarCapture] Starting capture: now=" + now + " holdSec=" + holdSec + " endTime=" + end + " (will complete at " + new java.util.Date(end) + ")";
+                    String initMsg = "[WarCapture] Starting capture: now=" + now
+                            + " holdSec="
+                            + holdSec
+                            + " endTime="
+                            + end
+                            + " (will complete at "
+                            + new java.util.Date(end)
+                            + ")";
                     System.out.println(initMsg);
-                    CaptureInfo info = new CaptureInfo(fp.getId(), new ChunkDimPos(curChunk.posX, curChunk.posZ, curChunk.dim), ep.posX, ep.posY, ep.posZ, end, claimOwner, fp.team);
+                    CaptureInfo info = new CaptureInfo(
+                            fp.getId(),
+                            new ChunkDimPos(curChunk.posX, curChunk.posZ, curChunk.dim),
+                            ep.posX,
+                            ep.posY,
+                            ep.posZ,
+                            end,
+                            claimOwner,
+                            fp.team);
                     active.put(fp.getId(), info);
                     capturerTeamData.capturingInProgress = true;
                     // CRITICAL: Mark team dirty so flag change is recognized globally
                     fp.team.markDirty();
                     // notify player
                     try {
-                        ep.addChatMessage(ServerUtilities.lang(ep, "§a[WarCapture] You started capturing chunks from " + claimOwner.getId() + ". Stay within " + radius + " chunks to complete in " + holdSec + "s!"));
+                        ep.addChatMessage(
+                                ServerUtilities.lang(
+                                        ep,
+                                        "§a[WarCapture] You started capturing chunks from " + claimOwner.getId()
+                                                + ". Stay within "
+                                                + radius
+                                                + " chunks to complete in "
+                                                + holdSec
+                                                + "s!"));
                     } catch (Exception ignored) {}
                 }
             } else {
                 // Player is NOT in a valid capture position. Check if they were capturing.
                 CaptureInfo capture = active.get(fp.getId());
                 ServerUtilitiesTeamData teamData = ServerUtilitiesTeamData.get(fp.team);
-                
-                System.out.println("[WarCapture] DEBUG: Player " + fp.getName() + " in else block. capture=" + (capture != null) + " flag=" + teamData.capturingInProgress + " chunk=" + curChunk);
-                
+
+                System.out.println(
+                        "[WarCapture] DEBUG: Player " + fp.getName()
+                                + " in else block. capture="
+                                + (capture != null)
+                                + " flag="
+                                + teamData.capturingInProgress
+                                + " chunk="
+                                + curChunk);
+
                 if (capture != null) {
                     // This player WAS capturing. Stop it.
                     System.out.println("[WarCapture] Removing capture for " + fp.getName());
@@ -177,21 +220,30 @@ public class WarCaptureManager {
                     teamData.capturingInProgress = false;
                     // CRITICAL: Mark team dirty to ensure flag change is recognized globally
                     fp.team.markDirty();
-                    
+
                     String msg = "§c[WarCapture] You left the capture area. Capture has been stopped.";
                     System.out.println("[WarCapture] Sending message to " + fp.getName() + ": " + msg);
                     ep.addChatMessage(ServerUtilities.lang(ep, msg));
-                    
+
                     if (ServerUtilitiesConfig.teams.war_capture_debug) {
-                        System.out.println("[WarCapture] Capture stopped and flag reset for " + fp.getName() + ". Flag now = " + teamData.capturingInProgress);
+                        System.out.println(
+                                "[WarCapture] Capture stopped and flag reset for " + fp.getName()
+                                        + ". Flag now = "
+                                        + teamData.capturingInProgress);
                     }
                 } else if (teamData.capturingInProgress) {
                     // SAFETY: Flag is true but no capture in map - desynchronized state.
-                    System.out.println("[WarCapture] WARNING: Team " + fp.team.getId() + " has capturingInProgress=true but no capture in map!");
+                    System.out.println(
+                            "[WarCapture] WARNING: Team " + fp.team.getId()
+                                    + " has capturingInProgress=true but no capture in map!");
                     teamData.capturingInProgress = false;
                     fp.team.markDirty();
-                    System.out.println("[WarCapture] Forcing flag reset for " + fp.getName() + ". Flag now = " + teamData.capturingInProgress);
-                    ep.addChatMessage(ServerUtilities.lang(ep, "§e[WarCapture] Resetting stuck capture state for your team."));
+                    System.out.println(
+                            "[WarCapture] Forcing flag reset for " + fp.getName()
+                                    + ". Flag now = "
+                                    + teamData.capturingInProgress);
+                    ep.addChatMessage(
+                            ServerUtilities.lang(ep, "§e[WarCapture] Resetting stuck capture state for your team."));
                 }
             }
         }
@@ -206,7 +258,11 @@ public class WarCaptureManager {
             if (active.size() > 0 && capturesProcessed == 1) {
                 // Log first capture of each check
                 long timeRem = info.endTime - System.currentTimeMillis();
-                System.out.println("[WarCapture] onCheck() processing " + active.size() + " active capture(s), first has " + Math.max(0, timeRem/1000) + "s remaining");
+                System.out.println(
+                        "[WarCapture] onCheck() processing " + active.size()
+                                + " active capture(s), first has "
+                                + Math.max(0, timeRem / 1000)
+                                + "s remaining");
             }
             ForgePlayer fp = serverutils.lib.data.Universe.get().getPlayer(info.playerId);
             if (fp == null || !fp.isOnline()) {
@@ -215,21 +271,29 @@ public class WarCaptureManager {
             }
 
             EntityPlayerMP ep = fp.getNullablePlayer();
-            if (ep == null) { it.remove(); continue; }
+            if (ep == null) {
+                it.remove();
+                continue;
+            }
 
             // Verify player still within allowed movement distance from the center chunk and still at war
             double px = ep.posX;
             double pz = ep.posZ;
             double cx = info.center.getBlockX();
             double cz = info.center.getBlockZ();
-            int allowedBlocks = ServerUtilitiesConfig.teams.war_capture_radius_chunks * 16; // radius in chunks -> blocks
+            int allowedBlocks = ServerUtilitiesConfig.teams.war_capture_radius_chunks * 16; // radius in chunks ->
+                                                                                            // blocks
             double dx = px - cx;
             double dz = pz - cz;
             double distSq = dx * dx + dz * dz;
             if (distSq > (double) allowedBlocks * (double) allowedBlocks) {
                 // moved too far -> cancel
-                try { 
-                    ep.addChatMessage(ServerUtilities.lang(ep, "§c[WarCapture] You moved too far from the capture area! (" + Math.round(Math.sqrt(distSq)) + "/" + allowedBlocks + " blocks)")); 
+                try {
+                    ep.addChatMessage(
+                            ServerUtilities.lang(
+                                    ep,
+                                    "§c[WarCapture] You moved too far from the capture area! (" + Math
+                                            .round(Math.sqrt(distSq)) + "/" + allowedBlocks + " blocks)"));
                 } catch (Exception ignored) {}
                 cancelCapture(info.playerId);
                 it.remove();
@@ -240,8 +304,12 @@ public class WarCaptureManager {
             if (centerChunk == null || !WarManager.get().isWarActive(fp.team, centerChunk.getTeam())
                     || !centerChunk.getTeam().equalsTeam(info.enemyTeam)) {
                 if (ServerUtilitiesConfig.teams.war_capture_debug) {
-                    String reason = centerChunk == null ? "chunk unclaimed" : (!WarManager.get().isWarActive(fp.team, centerChunk.getTeam()) ? "war ended" : "chunk ownership changed");
-                    try { ep.addChatMessage(ServerUtilities.lang(ep, "[WarCapture] Capture cancelled - " + reason)); } catch (Exception ignored) {}
+                    String reason = centerChunk == null ? "chunk unclaimed"
+                            : (!WarManager.get().isWarActive(fp.team, centerChunk.getTeam()) ? "war ended"
+                                    : "chunk ownership changed");
+                    try {
+                        ep.addChatMessage(ServerUtilities.lang(ep, "[WarCapture] Capture cancelled - " + reason));
+                    } catch (Exception ignored) {}
                 }
                 cancelCapture(info.playerId);
                 it.remove();
@@ -250,18 +318,27 @@ public class WarCaptureManager {
 
             long currentTime = System.currentTimeMillis();
             long timeRemaining = info.endTime - currentTime;
-            
+
             if (currentTime >= info.endTime) {
                 // Capture complete! Execute the capture
-                String dbgMsg = "[WarCapture] Capture completion triggered: currentTime=" + currentTime + " endTime=" + info.endTime + " diff=" + (currentTime - info.endTime);
+                String dbgMsg = "[WarCapture] Capture completion triggered: currentTime=" + currentTime
+                        + " endTime="
+                        + info.endTime
+                        + " diff="
+                        + (currentTime - info.endTime);
                 System.out.println(dbgMsg);
                 if (ServerUtilitiesConfig.teams.war_capture_debug) {
-                    try { ep.addChatMessage(ServerUtilities.lang(ep, "[WarCapture] Executing capture!")); } catch (Exception ignored) {}
+                    try {
+                        ep.addChatMessage(ServerUtilities.lang(ep, "[WarCapture] Executing capture!"));
+                    } catch (Exception ignored) {}
                 }
                 try {
                     int ceded = executeCapture(fp, info.center, info.enemyTeam, radius);
                     try {
-                        ep.addChatMessage(ServerUtilities.lang(ep, "§a[WarCapture] Capture complete: ceded " + ceded + " chunks to your team!"));
+                        ep.addChatMessage(
+                                ServerUtilities.lang(
+                                        ep,
+                                        "§a[WarCapture] Capture complete: ceded " + ceded + " chunks to your team!"));
                     } catch (Exception ignored) {}
                     if (ceded > 0) {
                         // Announce to other team members
@@ -270,7 +347,13 @@ public class WarCaptureManager {
                                 try {
                                     EntityPlayerMP tmp = teamMember.getNullablePlayer();
                                     if (tmp != null) {
-                                        tmp.addChatMessage(ServerUtilities.lang(tmp, "§a[WarCapture] " + fp.getName() + " captured " + ceded + " chunks from enemy!"));
+                                        tmp.addChatMessage(
+                                                ServerUtilities.lang(
+                                                        tmp,
+                                                        "§a[WarCapture] " + fp.getName()
+                                                                + " captured "
+                                                                + ceded
+                                                                + " chunks from enemy!"));
                                     }
                                 } catch (Exception ignored) {}
                             }
@@ -278,7 +361,8 @@ public class WarCaptureManager {
                     }
                 } catch (Exception ex) {
                     try {
-                        ep.addChatMessage(ServerUtilities.lang(ep, "§c[WarCapture] Capture failed: " + ex.getMessage()));
+                        ep.addChatMessage(
+                                ServerUtilities.lang(ep, "§c[WarCapture] Capture failed: " + ex.getMessage()));
                     } catch (Exception ignored) {}
                 }
                 // clear team flag
@@ -287,7 +371,10 @@ public class WarCaptureManager {
             } else if (timeRemaining > 0 && timeRemaining <= 5000) {
                 // Notify player when capture is about to complete (within 5 seconds)
                 try {
-                    ep.addChatMessage(ServerUtilities.lang(ep, "§6[WarCapture] Capture completing in " + (timeRemaining / 1000) + " seconds..."));
+                    ep.addChatMessage(
+                            ServerUtilities.lang(
+                                    ep,
+                                    "§6[WarCapture] Capture completing in " + (timeRemaining / 1000) + " seconds..."));
                 } catch (Exception ignored) {}
             }
         }
@@ -313,12 +400,12 @@ public class WarCaptureManager {
         if (capturer == null || !capturer.hasTeam()) return 0;
 
         int ceded = 0;
-        
+
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
                 ChunkDimPos pos = new ChunkDimPos(center.posX + dx, center.posZ + dz, center.dim);
                 ClaimedChunk existing = ClaimedChunks.instance.getChunk(pos);
-                
+
                 if (existing == null) {
                     // Unclaimed - try to claim it
                     try {

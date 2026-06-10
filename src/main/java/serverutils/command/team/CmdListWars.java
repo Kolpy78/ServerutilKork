@@ -1,13 +1,16 @@
 package serverutils.command.team;
 
+import java.util.Map;
+
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+
 import serverutils.ServerUtilities;
 import serverutils.data.WarManager;
 import serverutils.lib.command.CmdBase;
-import java.util.Map;
 
 public class CmdListWars extends CmdBase {
+
     public CmdListWars() {
         super("listwars", Level.ALL);
     }
@@ -30,9 +33,22 @@ public class CmdListWars extends CmdBase {
                     long secondsLeft = (info.warEndTime - now) / 1000L;
                     if (now < info.graceEndTime) {
                         long graceLeft = (info.graceEndTime - now) / 1000L;
-                        sender.addChatMessage(ServerUtilities.lang(sender, " - " + teamA + " vs " + teamB + " (grace: " + graceLeft + "s, total: " + secondsLeft + "s left)"));
+                        sender.addChatMessage(
+                                ServerUtilities.lang(
+                                        sender,
+                                        " - " + teamA
+                                                + " vs "
+                                                + teamB
+                                                + " (grace: "
+                                                + graceLeft
+                                                + "s, total: "
+                                                + secondsLeft
+                                                + "s left)"));
                     } else {
-                        sender.addChatMessage(ServerUtilities.lang(sender, " - " + teamA + " vs " + teamB + " (active, " + secondsLeft + "s left)"));
+                        sender.addChatMessage(
+                                ServerUtilities.lang(
+                                        sender,
+                                        " - " + teamA + " vs " + teamB + " (active, " + secondsLeft + "s left)"));
                     }
                 }
             }

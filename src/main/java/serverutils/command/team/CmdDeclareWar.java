@@ -3,20 +3,22 @@ package serverutils.command.team;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
+
 import serverutils.ServerUtilities;
 import serverutils.ServerUtilitiesConfig;
+import serverutils.data.ServerUtilitiesTeamData;
 import serverutils.lib.command.CmdBase;
 import serverutils.lib.command.CommandUtils;
 import serverutils.lib.data.ForgePlayer;
 import serverutils.lib.data.ForgeTeam;
 import serverutils.lib.data.Universe;
-import serverutils.data.ServerUtilitiesTeamData;
 
 public class CmdDeclareWar extends CmdBase {
 
     public CmdDeclareWar() {
         super("declarewar", Level.ALL);
     }
+
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         // Usage: /team declarewar <targetTeam>
@@ -32,7 +34,7 @@ public class CmdDeclareWar extends CmdBase {
 
         String targetTeamId = args[0];
         ForgeTeam targetTeam = Universe.get().getTeam(targetTeamId);
-        
+
         // If not found by ID, try to find by title
         if (!targetTeam.isValid()) {
             for (ForgeTeam team : Universe.get().getTeams()) {
@@ -42,7 +44,7 @@ public class CmdDeclareWar extends CmdBase {
                 }
             }
         }
-        
+
         if (!targetTeam.isValid()) {
             throw ServerUtilities.error(sender, "Target team does not exist.");
         }
@@ -87,8 +89,12 @@ public class CmdDeclareWar extends CmdBase {
             // Calculate required active members (round up)
             int requiredActive = (int) Math.ceil(totalMembers * requiredActivePercentage / 100.0);
             if (activeMembers < requiredActive) {
-                throw ServerUtilities.error(sender, "Target team does not meet the activity requirement. "
-                    + activeMembers + "/" + requiredActive + " members are active enough to declare war.");
+                throw ServerUtilities.error(
+                        sender,
+                        "Target team does not meet the activity requirement. " + activeMembers
+                                + "/"
+                                + requiredActive
+                                + " members are active enough to declare war.");
             }
         }
 
@@ -102,7 +108,8 @@ public class CmdDeclareWar extends CmdBase {
         ServerUtilitiesTeamData teamData = ServerUtilitiesTeamData.get(p.team);
         if (teamData.warCooldownUntil != null && now < teamData.warCooldownUntil) {
             long secondsLeft = (teamData.warCooldownUntil - now) / 1000L;
-            throw ServerUtilities.error(sender, "You must wait " + secondsLeft + " seconds before declaring war again.");
+            throw ServerUtilities
+                    .error(sender, "You must wait " + secondsLeft + " seconds before declaring war again.");
         }
 
         // Only allow team leaders to declare war
@@ -110,29 +117,42 @@ public class CmdDeclareWar extends CmdBase {
             throw ServerUtilities.error(sender, "Only the team leader can declare war on another team.");
         }
 
-    // Register war in WarManager using configured grace period.
-    long graceMillis = (long) ServerUtilitiesConfig.teams.war_grace_period_seconds * 1000L;
-    serverutils.data.WarManager.get().declareWar(p.team, targetTeam,
-        ServerUtilitiesConfig.teams.war_duration_minutes * 60L * 1000L, graceMillis);
+        // Register war in WarManager using configured grace period.
+        long graceMillis = (long) ServerUtilitiesConfig.teams.war_grace_period_seconds * 1000L;
+        serverutils.data.WarManager.get().declareWar(
+                p.team,
+                targetTeam,
+                ServerUtilitiesConfig.teams.war_duration_minutes * 60L * 1000L,
+                graceMillis);
         // Set cooldown
         teamData.warCooldownUntil = now + (ServerUtilitiesConfig.teams.war_cooldown_seconds * 1000L);
 
-    // Friendly message: prefer minutes when possible
-    long graceSeconds = ServerUtilitiesConfig.teams.war_grace_period_seconds;
-    String whenMsg;
-    if (graceSeconds % 60 == 0) {
-        whenMsg = (graceSeconds / 60) + " minutes";
-    } else {
-        whenMsg = graceSeconds + " seconds";
-    }
-    sender.addChatMessage(ServerUtilities.lang(sender,
-        "War declared between your team and " + targetTeam.getId() + "! The war will become active in " + whenMsg + "."));
+        // Friendly message: prefer minutes when possible
+        long graceSeconds = ServerUtilitiesConfig.teams.war_grace_period_seconds;
+        String whenMsg;
+        if (graceSeconds % 60 == 0) {
+            whenMsg = (graceSeconds / 60) + " minutes";
+        } else {
+            whenMsg = graceSeconds + " seconds";
+        }
+        sender.addChatMessage(
+                ServerUtilities.lang(
+                        sender,
+                        "War declared between your team and " + targetTeam.getId()
+                                + "! The war will become active in "
+                                + whenMsg
+                                + "."));
 
         // Announce to all players on the server (no grace period mention)
         for (Object obj : player.mcServer.getConfigurationManager().playerEntityList) {
             if (obj instanceof EntityPlayerMP) {
-                ((EntityPlayerMP) obj).addChatMessage(ServerUtilities.lang((EntityPlayerMP) obj,
-                    "\u00a7cWar declared between team " + p.team.getTitle().getUnformattedText() + " and team " + targetTeam.getTitle().getUnformattedText() + "!"));
+                ((EntityPlayerMP) obj).addChatMessage(
+                        ServerUtilities.lang(
+                                (EntityPlayerMP) obj,
+                                "\u00a7cWar declared between team " + p.team.getTitle().getUnformattedText()
+                                        + " and team "
+                                        + targetTeam.getTitle().getUnformattedText()
+                                        + "!"));
             }
         }
     }

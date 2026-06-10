@@ -1,18 +1,19 @@
 package serverutils.lib.util;
 
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
-import serverutils.lib.data.ForgeTeam;
-import serverutils.lib.data.ForgePlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
+
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import serverutils.events.team.ForgeTeamCreatedEvent;
 import serverutils.events.team.ForgeTeamDeletedEvent;
+import serverutils.events.team.ForgeTeamLoadedEvent;
 import serverutils.events.team.ForgeTeamPlayerJoinedEvent;
 import serverutils.events.team.ForgeTeamPlayerLeftEvent;
-import serverutils.events.team.ForgeTeamLoadedEvent;
+import serverutils.lib.data.ForgePlayer;
+import serverutils.lib.data.ForgeTeam;
 import serverutils.lib.data.Universe;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 /**
  * Helper that keeps Minecraft scoreboard teams in sync with ServerUtilities teams.
@@ -25,8 +26,7 @@ public class ScoreboardSync {
         // Ensure instance exists and register for events via Forge event bus if needed.
     }
 
-    public ScoreboardSync() {
-    }
+    public ScoreboardSync() {}
 
     private boolean enabled() {
         try {
@@ -72,7 +72,8 @@ public class ScoreboardSync {
                 int teamCount = sb.getTeams().size();
                 final int MAX_ALLOWED_SCOREBOARD_TEAMS = 1024;
                 if (teamCount >= MAX_ALLOWED_SCOREBOARD_TEAMS) {
-                    serverutils.ServerUtilities.LOGGER.warn("Not creating scoreboard team '" + name + "' - too many teams: " + teamCount);
+                    serverutils.ServerUtilities.LOGGER
+                            .warn("Not creating scoreboard team '" + name + "' - too many teams: " + teamCount);
                     return null;
                 }
 
@@ -106,7 +107,7 @@ public class ScoreboardSync {
         ScorePlayerTeam spt = getOrCreateTeam(team);
         if (spt == null) return;
         String playerName = player.getName();
-        
+
         // remove from any existing team first
         ScorePlayerTeam currentTeam = sb.getPlayersTeam(playerName);
         if (currentTeam != null && currentTeam != spt) {
@@ -116,7 +117,7 @@ public class ScoreboardSync {
                 // ignore
             }
         }
-        
+
         // Try direct team member collection manipulation (works in 1.7.10)
         try {
             java.lang.reflect.Field membershipCollection = spt.getClass().getDeclaredField("membershipCollection");
@@ -130,7 +131,7 @@ public class ScoreboardSync {
         } catch (Throwable ignore) {
             // ignore and try next method
         }
-        
+
         // Fallback: try any addPlayer variant that might exist
         try {
             java.lang.reflect.Method addPlayerMethod = spt.getClass().getMethod("addPlayer", String.class);
@@ -139,7 +140,7 @@ public class ScoreboardSync {
         } catch (Throwable ignore) {
             // ignore and try next method
         }
-        
+
         // Last fallback: try using team's players set directly if exposed
         try {
             java.lang.reflect.Field playersField = spt.getClass().getDeclaredField("players");

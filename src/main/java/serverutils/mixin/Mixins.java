@@ -53,9 +53,6 @@ public enum Mixins implements IMixins {
             .setPhase(Phase.EARLY)
             .setApplyIf(() -> world.enable_player_sleeping_percentage)
             .addCommonMixins("minecraft.MixinWorldServer_SleepPercentage")),
-    EXPLOSION_PROTECTION(new MixinBuilder("Protect claimed chunks from explosions")
-            .setPhase(Phase.EARLY)
-            .addServerMixins("minecraft.MixinWorldExplosionProtection")),
     DISABLE_ENDERMEN_GRIEFING(new MixinBuilder("Disable Endermen Griefing in Claimed Chunks")
             .setPhase(Phase.EARLY)
             .setApplyIf(() -> mixins.endermen)

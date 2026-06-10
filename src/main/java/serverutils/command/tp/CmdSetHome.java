@@ -14,7 +14,6 @@ import serverutils.lib.command.CmdBase;
 import serverutils.lib.command.CommandUtils;
 import serverutils.lib.config.RankConfigAPI;
 import serverutils.lib.data.Universe;
-import serverutils.lib.data.ForgePlayer;
 import serverutils.lib.math.BlockDimPos;
 
 public class CmdSetHome extends CmdBase {
@@ -38,12 +37,12 @@ public class CmdSetHome extends CmdBase {
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         EntityPlayerMP player = getCommandSenderAsPlayer(sender);
         serverutils.lib.data.ForgePlayer forgePlayer = CommandUtils.getForgePlayer(player);
-        
+
         // Block /sethome for players at war
         if (forgePlayer.hasTeam() && !WarManager.get().getWarringTeams(forgePlayer.team.getId()).isEmpty()) {
             throw ServerUtilities.error(sender, "You cannot set home while your team is at war.");
         }
-        
+
         ServerUtilitiesPlayerData data = ServerUtilitiesPlayerData.get(forgePlayer);
 
         if (args.length == 0) {

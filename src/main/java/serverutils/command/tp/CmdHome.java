@@ -16,10 +16,10 @@ import net.minecraft.util.IChatComponent;
 
 import serverutils.ServerUtilities;
 import serverutils.ServerUtilitiesPermissions;
+import serverutils.data.ClaimedChunks;
 import serverutils.data.ServerUtilitiesPlayerData;
 import serverutils.data.TeleportType;
 import serverutils.data.WarManager;
-import serverutils.data.ClaimedChunks;
 import serverutils.lib.command.CmdBase;
 import serverutils.lib.command.CommandUtils;
 import serverutils.lib.data.ForgePlayer;
@@ -110,12 +110,13 @@ public class CmdHome extends CmdBase {
 
         EntityPlayerMP player = getCommandSenderAsPlayer(sender);
         ForgePlayer forgePlayer = CommandUtils.getForgePlayer(player);
-        
+
         // Check if destination is in an enemy base while at war
-        if (forgePlayer.hasTeam() && ClaimedChunks.isActive() && !WarManager.get().getWarringTeams(forgePlayer.team.getId()).isEmpty()) {
+        if (forgePlayer.hasTeam() && ClaimedChunks.isActive()
+                && !WarManager.get().getWarringTeams(forgePlayer.team.getId()).isEmpty()) {
             ChunkDimPos homeChunk = new ChunkDimPos(pos.posX, pos.posY, pos.posZ, pos.dim);
             serverutils.data.ClaimedChunk chunk = ClaimedChunks.instance.getChunk(homeChunk);
-            if (chunk != null && !chunk.getTeam().equalsTeam(forgePlayer.team) 
+            if (chunk != null && !chunk.getTeam().equalsTeam(forgePlayer.team)
                     && WarManager.get().isWarActive(forgePlayer.team, chunk.getTeam())) {
                 throw ServerUtilities.error(sender, "You cannot teleport to a home in an enemy base while at war.");
             }
