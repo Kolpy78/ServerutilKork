@@ -1,10 +1,7 @@
- package serverutils.handlers;
+package serverutils.handlers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.IMob;
@@ -19,17 +16,16 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
-import serverutils.lib.data.ForgePlayer;
-import serverutils.lib.data.ForgeTeam;
-import serverutils.lib.data.Universe;
-import serverutils.data.WarManager;
-
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import serverutils.ServerUtilities;
 import serverutils.ServerUtilitiesConfig;
 import serverutils.data.ClaimedChunk;
 import serverutils.data.ClaimedChunks;
 import serverutils.data.ServerUtilitiesUniverseData;
+import serverutils.data.WarManager;
+import serverutils.lib.data.ForgePlayer;
+import serverutils.lib.data.ForgeTeam;
+import serverutils.lib.data.Universe;
 import serverutils.lib.math.ChunkDimPos;
 import serverutils.pregenerator.ChunkLoaderManager;
 
@@ -141,8 +137,9 @@ public class ServerUtilitiesWorldEventHandler {
         Entity source = explosion.exploder;
         if (!(source instanceof EntityPlayerMP)) {
             try {
-                EntityPlayerMP player = explosion.getExplosivePlacedBy() instanceof EntityPlayerMP ?
-                        (EntityPlayerMP) explosion.getExplosivePlacedBy() : null;
+                EntityPlayerMP player = explosion.getExplosivePlacedBy() instanceof EntityPlayerMP
+                        ? (EntityPlayerMP) explosion.getExplosivePlacedBy()
+                        : null;
                 source = player;
             } catch (Throwable ignored) {
                 source = null;

@@ -3,6 +3,7 @@ package serverutils.command.team;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
+
 import serverutils.ServerUtilities;
 import serverutils.data.WarManager;
 import serverutils.data.WarProposalManager;
@@ -21,7 +22,8 @@ public class CmdCeasefire extends CmdBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if (args.length == 0) {
-            throw ServerUtilities.error(sender, "Usage: /team ceasefire <targetTeam> <minutes> or /team ceasefire accept/deny");
+            throw ServerUtilities
+                    .error(sender, "Usage: /team ceasefire <targetTeam> <minutes> or /team ceasefire accept/deny");
         }
 
         EntityPlayerMP player = getCommandSenderAsPlayer(sender);
@@ -74,16 +76,30 @@ public class CmdCeasefire extends CmdBase {
 
         // Send proposal to target team leader
         WarProposalManager.WarProposal proposal = new WarProposalManager.WarProposal(
-            WarProposalManager.ProposalType.CEASEFIRE, p.team, targetTeam, 5 * 60 * 1000L); // 5 minute proposal expiry
+                WarProposalManager.ProposalType.CEASEFIRE,
+                p.team,
+                targetTeam,
+                5 * 60 * 1000L); // 5 minute proposal expiry
         proposal.ceasefireDurationMillis = ceasefireMinutes * 60 * 1000L;
         WarProposalManager.get().addProposal(proposal);
 
-        sender.addChatMessage(ServerUtilities.lang(sender, "Ceasefire proposal sent to " + targetTeam.getId() + " for " + ceasefireMinutes + " minutes. Awaiting leader response."));
+        sender.addChatMessage(
+                ServerUtilities.lang(
+                        sender,
+                        "Ceasefire proposal sent to " + targetTeam.getId()
+                                + " for "
+                                + ceasefireMinutes
+                                + " minutes. Awaiting leader response."));
 
         ForgePlayer targetLeader = targetTeam.getOwner();
         if (targetLeader != null && targetLeader.isOnline()) {
-            targetLeader.getPlayer().addChatMessage(ServerUtilities.lang(targetLeader.getPlayer(),
-                "Team " + p.team.getId() + " has proposed a " + ceasefireMinutes + " minute ceasefire. Use /team ceasefire accept to accept or /team ceasefire deny to reject."));
+            targetLeader.getPlayer().addChatMessage(
+                    ServerUtilities.lang(
+                            targetLeader.getPlayer(),
+                            "Team " + p.team.getId()
+                                    + " has proposed a "
+                                    + ceasefireMinutes
+                                    + " minute ceasefire. Use /team ceasefire accept to accept or /team ceasefire deny to reject."));
         }
     }
 
@@ -95,7 +111,7 @@ public class CmdCeasefire extends CmdBase {
         // Find a pending ceasefire proposal targeting this team
         WarProposalManager.WarProposal proposal = null;
         ForgeTeam proposerTeam = null;
-        
+
         for (ForgeTeam team : Universe.get().getTeams()) {
             WarProposalManager.WarProposal prop = WarProposalManager.get().getProposal(team, p.team);
             if (prop != null && prop.type == WarProposalManager.ProposalType.CEASEFIRE) {
@@ -120,21 +136,36 @@ public class CmdCeasefire extends CmdBase {
                 }
             }
 
-            sender.addChatMessage(ServerUtilities.lang(sender, "You accepted the ceasefire. The war has been paused for " + (proposal.ceasefireDurationMillis / 60 / 1000) + " minutes."));
+            sender.addChatMessage(
+                    ServerUtilities.lang(
+                            sender,
+                            "You accepted the ceasefire. The war has been paused for "
+                                    + (proposal.ceasefireDurationMillis / 60 / 1000)
+                                    + " minutes."));
             ForgePlayer proposerLeader = proposerTeam.getOwner();
             if (proposerLeader != null && proposerLeader.isOnline()) {
-                proposerLeader.getPlayer().addChatMessage(ServerUtilities.lang(proposerLeader.getPlayer(),
-                    "Your ceasefire proposal was accepted by " + p.team.getId() + ". War paused for " + (proposal.ceasefireDurationMillis / 60 / 1000) + " minutes."));
+                proposerLeader.getPlayer().addChatMessage(
+                        ServerUtilities.lang(
+                                proposerLeader.getPlayer(),
+                                "Your ceasefire proposal was accepted by " + p.team.getId()
+                                        + ". War paused for "
+                                        + (proposal.ceasefireDurationMillis / 60 / 1000)
+                                        + " minutes."));
             }
-            
+
             // Global announcement
-            ServerUtilities.announceGlobalCeasefire(proposerTeam.getId(), p.team.getId(), (int)(proposal.ceasefireDurationMillis / 60 / 1000));
+            ServerUtilities.announceGlobalCeasefire(
+                    proposerTeam.getId(),
+                    p.team.getId(),
+                    (int) (proposal.ceasefireDurationMillis / 60 / 1000));
         } else {
             sender.addChatMessage(ServerUtilities.lang(sender, "You denied the ceasefire."));
             ForgePlayer proposerLeader = proposerTeam.getOwner();
             if (proposerLeader != null && proposerLeader.isOnline()) {
-                proposerLeader.getPlayer().addChatMessage(ServerUtilities.lang(proposerLeader.getPlayer(),
-                    "Your ceasefire proposal was denied by " + p.team.getId() + "."));
+                proposerLeader.getPlayer().addChatMessage(
+                        ServerUtilities.lang(
+                                proposerLeader.getPlayer(),
+                                "Your ceasefire proposal was denied by " + p.team.getId() + "."));
             }
         }
 

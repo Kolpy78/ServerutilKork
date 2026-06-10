@@ -3,6 +3,7 @@ package serverutils.command.team;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
+
 import serverutils.ServerUtilities;
 import serverutils.ServerUtilitiesConfig;
 import serverutils.data.ClaimedChunks;
@@ -10,8 +11,7 @@ import serverutils.lib.command.CmdBase;
 import serverutils.lib.math.ChunkDimPos;
 
 /**
- * Admin command to diagnose war capture system configuration and chunk claiming status.
- * Usage: /team diagnosewarcapture
+ * Admin command to diagnose war capture system configuration and chunk claiming status. Usage: /team diagnosewarcapture
  */
 public class CmdDiagnoseWarCapture extends CmdBase {
 
@@ -55,13 +55,18 @@ public class CmdDiagnoseWarCapture extends CmdBase {
         // Explain the issue
         sender.addChatMessage(ServerUtilities.lang(sender, "§6=== Analysis ==="));
         if (!warCaptureEnabled) {
-            sender.addChatMessage(ServerUtilities.lang(sender, "§c[ISSUE] war_capture_enabled is FALSE - capture disabled"));
+            sender.addChatMessage(
+                    ServerUtilities.lang(sender, "§c[ISSUE] war_capture_enabled is FALSE - capture disabled"));
         } else if (!chunkClaimingEnabled) {
-            sender.addChatMessage(ServerUtilities.lang(sender, "§c[ISSUE] chunk_claiming is FALSE - all chunk lookups return null"));
+            sender.addChatMessage(
+                    ServerUtilities.lang(sender, "§c[ISSUE] chunk_claiming is FALSE - all chunk lookups return null"));
         } else if (!isActive) {
             sender.addChatMessage(ServerUtilities.lang(sender, "§c[ISSUE] ClaimedChunks.isActive() is FALSE"));
         } else if (isDimensionBlocked) {
-            sender.addChatMessage(ServerUtilities.lang(sender, "§c[ISSUE] Your dimension is in blocked_claiming_dimensions - chunk lookups disabled"));
+            sender.addChatMessage(
+                    ServerUtilities.lang(
+                            sender,
+                            "§c[ISSUE] Your dimension is in blocked_claiming_dimensions - chunk lookups disabled"));
         } else {
             sender.addChatMessage(ServerUtilities.lang(sender, "§a[OK] War capture config looks good!"));
         }

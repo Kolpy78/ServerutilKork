@@ -1,21 +1,24 @@
 package serverutils.data;
 
-import serverutils.lib.data.ForgeTeam;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import serverutils.lib.data.ForgeTeam;
 
 /**
  * Tracks active wars between teams and their expiration times (in millis).
  */
 public class WarManager {
+
     private static final WarManager INSTANCE = new WarManager();
     // Map: teamA -> (teamB -> WarInfo)
     private final Map<String, Map<String, WarInfo>> wars = new HashMap<>();
@@ -24,8 +27,10 @@ public class WarManager {
     // Persistent sets to track which wars have been announced (prevents message spam)
     private final Set<String> announcedActive = new HashSet<>();
     private final Set<String> announcedEnd = new HashSet<>();
+
     // Make WarInfo public for use in commands
     public static class WarInfo {
+
         public long graceEndTime;
         public long warEndTime;
     }
@@ -165,12 +170,15 @@ public class WarManager {
                 String teamB = e.getKey();
                 WarInfo info = e.getValue();
                 // Announce war active (only once per war)
-                if (now >= info.graceEndTime && now < info.warEndTime && !announcedActive.contains(teamA + ":" + teamB) && !announcedActive.contains(teamB + ":" + teamA)) {
+                if (now >= info.graceEndTime && now < info.warEndTime
+                        && !announcedActive.contains(teamA + ":" + teamB)
+                        && !announcedActive.contains(teamB + ":" + teamA)) {
                     serverutils.ServerUtilities.announceGlobalWarActive(teamA, teamB);
                     announcedActive.add(teamA + ":" + teamB);
                 }
                 // Announce war end (only once per war)
-                if (info.warEndTime <= now && !announcedEnd.contains(teamA + ":" + teamB) && !announcedEnd.contains(teamB + ":" + teamA)) {
+                if (info.warEndTime <= now && !announcedEnd.contains(teamA + ":" + teamB)
+                        && !announcedEnd.contains(teamB + ":" + teamA)) {
                     entry.getValue().remove(teamB);
                     Map<String, WarInfo> other = wars.get(teamB);
                     if (other != null) other.remove(teamA);
@@ -196,7 +204,7 @@ public class WarManager {
         File file = new File(WARS_FILE);
         if (!file.exists()) return;
         try (FileReader reader = new FileReader(file)) {
-            java.lang.reflect.Type type = new TypeToken<Map<String, Map<String, WarInfo>>>(){}.getType();
+            java.lang.reflect.Type type = new TypeToken<Map<String, Map<String, WarInfo>>>() {}.getType();
             Map<String, Map<String, WarInfo>> loaded = GSON.fromJson(reader, type);
             if (loaded != null) {
                 wars.clear();

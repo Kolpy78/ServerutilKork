@@ -3,6 +3,7 @@ package serverutils.command.team;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
+
 import serverutils.ServerUtilities;
 import serverutils.data.WarManager;
 import serverutils.data.WarProposalManager;
@@ -58,14 +59,21 @@ public class CmdTruce extends CmdBase {
         }
 
         // Send proposal to target team leader
-        WarProposalManager.get().addProposal(WarProposalManager.ProposalType.TRUCE, p.team, targetTeam, 5 * 60 * 1000L); // 5 minute expiry
-        
-        sender.addChatMessage(ServerUtilities.lang(sender, "Truce proposal sent to " + targetTeam.getId() + ". Awaiting leader response."));
+        WarProposalManager.get().addProposal(WarProposalManager.ProposalType.TRUCE, p.team, targetTeam, 5 * 60 * 1000L); // 5
+                                                                                                                         // minute
+                                                                                                                         // expiry
+
+        sender.addChatMessage(
+                ServerUtilities
+                        .lang(sender, "Truce proposal sent to " + targetTeam.getId() + ". Awaiting leader response."));
 
         ForgePlayer targetLeader = targetTeam.getOwner();
         if (targetLeader != null && targetLeader.isOnline()) {
-            targetLeader.getPlayer().addChatMessage(ServerUtilities.lang(targetLeader.getPlayer(),
-                "Team " + p.team.getId() + " has proposed a truce. Use /team truce accept to accept or /team truce deny to reject."));
+            targetLeader.getPlayer().addChatMessage(
+                    ServerUtilities.lang(
+                            targetLeader.getPlayer(),
+                            "Team " + p.team.getId()
+                                    + " has proposed a truce. Use /team truce accept to accept or /team truce deny to reject."));
         }
     }
 
@@ -77,7 +85,7 @@ public class CmdTruce extends CmdBase {
         // Find a pending truce proposal targeting this team
         WarProposalManager.WarProposal proposal = null;
         ForgeTeam proposerTeam = null;
-        
+
         for (ForgeTeam team : Universe.get().getTeams()) {
             WarProposalManager.WarProposal prop = WarProposalManager.get().getProposal(team, p.team);
             if (prop != null && prop.type == WarProposalManager.ProposalType.TRUCE) {
@@ -98,18 +106,22 @@ public class CmdTruce extends CmdBase {
             sender.addChatMessage(ServerUtilities.lang(sender, "You accepted the truce. The war has ended."));
             ForgePlayer proposerLeader = proposerTeam.getOwner();
             if (proposerLeader != null && proposerLeader.isOnline()) {
-                proposerLeader.getPlayer().addChatMessage(ServerUtilities.lang(proposerLeader.getPlayer(),
-                    "Your truce proposal was accepted by " + p.team.getId() + ". The war has ended."));
+                proposerLeader.getPlayer().addChatMessage(
+                        ServerUtilities.lang(
+                                proposerLeader.getPlayer(),
+                                "Your truce proposal was accepted by " + p.team.getId() + ". The war has ended."));
             }
-            
+
             // Global announcement
             ServerUtilities.announceGlobalTruce(proposerTeam.getId(), p.team.getId());
         } else {
             sender.addChatMessage(ServerUtilities.lang(sender, "You denied the truce."));
             ForgePlayer proposerLeader = proposerTeam.getOwner();
             if (proposerLeader != null && proposerLeader.isOnline()) {
-                proposerLeader.getPlayer().addChatMessage(ServerUtilities.lang(proposerLeader.getPlayer(),
-                    "Your truce proposal was denied by " + p.team.getId() + "."));
+                proposerLeader.getPlayer().addChatMessage(
+                        ServerUtilities.lang(
+                                proposerLeader.getPlayer(),
+                                "Your truce proposal was denied by " + p.team.getId() + "."));
             }
         }
 

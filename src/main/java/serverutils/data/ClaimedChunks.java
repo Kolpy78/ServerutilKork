@@ -240,10 +240,10 @@ public class ClaimedChunks {
 
         Block block = player.worldObj.getBlock(x, y, z);
 
-    ClaimedChunk chunk = instance.getChunk(new ChunkDimPos(x, y, z, player.dimension));
-    return chunk != null && !ServerUtilitiesPermissions.hasBlockEditingPermission(player, block)
-        && !chunk.getTeam()
-            .hasStatus(instance.universe.getPlayer(player), chunk.getData().getEditBlocksStatus());
+        ClaimedChunk chunk = instance.getChunk(new ChunkDimPos(x, y, z, player.dimension));
+        return chunk != null && !ServerUtilitiesPermissions.hasBlockEditingPermission(player, block)
+                && !chunk.getTeam()
+                        .hasStatus(instance.universe.getPlayer(player), chunk.getData().getEditBlocksStatus());
     }
 
     public static boolean blockBlockInteractions(EntityPlayer player, int x, int y, int z, int meta) {
@@ -259,10 +259,10 @@ public class ClaimedChunks {
 
         Block block = player.worldObj.getBlock(x, y, z);
 
-    ClaimedChunk chunk = instance.getChunk(new ChunkDimPos(x, y, z, player.dimension));
-    return chunk != null && !ServerUtilitiesPermissions.hasBlockInteractionPermission(player, block)
-        && !chunk.getTeam()
-            .hasStatus(instance.universe.getPlayer(player), chunk.getData().getInteractWithBlocksStatus());
+        ClaimedChunk chunk = instance.getChunk(new ChunkDimPos(x, y, z, player.dimension));
+        return chunk != null && !ServerUtilitiesPermissions.hasBlockInteractionPermission(player, block)
+                && !chunk.getTeam()
+                        .hasStatus(instance.universe.getPlayer(player), chunk.getData().getInteractWithBlocksStatus());
     }
 
     public static boolean blockItemUse(EntityPlayer player, int x, int y, int z) {

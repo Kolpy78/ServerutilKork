@@ -150,8 +150,8 @@ public class ServerUtilitiesCommon {
         MinecraftForge.EVENT_BUS.register(ServerUtilitiesServerEventHandler.INST);
         MinecraftForge.EVENT_BUS.register(ServerUtilitiesWorldEventHandler.INST);
         MinecraftForge.EVENT_BUS.register(ServerUtilitiesUniverseData.INST);
-    // register scoreboard sync for team <-> scoreboard synchronization
-    MinecraftForge.EVENT_BUS.register(new serverutils.lib.util.ScoreboardSync());
+        // register scoreboard sync for team <-> scoreboard synchronization
+        MinecraftForge.EVENT_BUS.register(new serverutils.lib.util.ScoreboardSync());
         MinecraftForge.EVENT_BUS.register(ServerUtilitiesPermissions.INST);
         FMLCommonHandler.instance().bus().register(ServerUtilitiesServerEventHandler.INST);
         if (AuroraConfig.general.enable) {

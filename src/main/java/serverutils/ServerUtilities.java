@@ -14,11 +14,9 @@ import net.minecraft.util.IChatComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -26,6 +24,7 @@ import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.relauncher.Side;
 import serverutils.lib.command.CommandUtils;
@@ -144,11 +143,9 @@ public class ServerUtilities {
      */
     public static void announceGlobalWarEnd(String teamA, String teamB) {
         String message = "\u00a7eThe war between team " + teamA + " and team " + teamB + " has ended!";
-        for (Object obj : net.minecraft.server.MinecraftServer.getServer().getConfigurationManager()
-            .playerEntityList) {
+        for (Object obj : net.minecraft.server.MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
             if (obj instanceof net.minecraft.entity.player.EntityPlayerMP) {
-                ((net.minecraft.entity.player.EntityPlayerMP) obj)
-                    .addChatMessage(new ChatComponentText(message));
+                ((net.minecraft.entity.player.EntityPlayerMP) obj).addChatMessage(new ChatComponentText(message));
             }
         }
     }
@@ -173,13 +170,14 @@ public class ServerUtilities {
             // Fall back to team IDs if there's any error
         }
 
-        String message = "\u00a7cWAR ACTIVE! The war between team \u00a7f" + titleA + "\u00a7c and team "
-            + "\u00a7f" + titleB + "\u00a7c is now active!";
-        for (Object obj : net.minecraft.server.MinecraftServer.getServer().getConfigurationManager()
-            .playerEntityList) {
+        String message = "\u00a7cWAR ACTIVE! The war between team \u00a7f" + titleA
+                + "\u00a7c and team "
+                + "\u00a7f"
+                + titleB
+                + "\u00a7c is now active!";
+        for (Object obj : net.minecraft.server.MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
             if (obj instanceof net.minecraft.entity.player.EntityPlayerMP) {
-                ((net.minecraft.entity.player.EntityPlayerMP) obj)
-                    .addChatMessage(new ChatComponentText(message));
+                ((net.minecraft.entity.player.EntityPlayerMP) obj).addChatMessage(new ChatComponentText(message));
             }
         }
     }
@@ -191,8 +189,11 @@ public class ServerUtilities {
         for (Object obj : net.minecraft.server.MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
             if (obj instanceof net.minecraft.entity.player.EntityPlayerMP) {
                 ((net.minecraft.entity.player.EntityPlayerMP) obj).addChatMessage(
-                    new ChatComponentText(
-                        "\u00a76Team " + surrenderingTeam + " has surrendered to team " + acceptingTeam + "! All their chunks have been ceded."));
+                        new ChatComponentText(
+                                "\u00a76Team " + surrenderingTeam
+                                        + " has surrendered to team "
+                                        + acceptingTeam
+                                        + "! All their chunks have been ceded."));
             }
         }
     }
@@ -204,8 +205,8 @@ public class ServerUtilities {
         for (Object obj : net.minecraft.server.MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
             if (obj instanceof net.minecraft.entity.player.EntityPlayerMP) {
                 ((net.minecraft.entity.player.EntityPlayerMP) obj).addChatMessage(
-                    new ChatComponentText(
-                        "\u00a7aA truce has been agreed between team " + teamA + " and team " + teamB + "!"));
+                        new ChatComponentText(
+                                "\u00a7aA truce has been agreed between team " + teamA + " and team " + teamB + "!"));
             }
         }
     }
@@ -217,8 +218,13 @@ public class ServerUtilities {
         for (Object obj : net.minecraft.server.MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
             if (obj instanceof net.minecraft.entity.player.EntityPlayerMP) {
                 ((net.minecraft.entity.player.EntityPlayerMP) obj).addChatMessage(
-                    new ChatComponentText(
-                        "\u00a79A " + durationMinutes + "-minute ceasefire has been agreed between team " + teamA + " and team " + teamB + "!"));
+                        new ChatComponentText(
+                                "\u00a79A " + durationMinutes
+                                        + "-minute ceasefire has been agreed between team "
+                                        + teamA
+                                        + " and team "
+                                        + teamB
+                                        + "!"));
             }
         }
     }

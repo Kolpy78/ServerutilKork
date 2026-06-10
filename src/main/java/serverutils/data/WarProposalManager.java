@@ -9,6 +9,7 @@ import serverutils.lib.data.ForgeTeam;
  * Manages pending war proposals (surrender, truce, ceasefire).
  */
 public class WarProposalManager {
+
     private static final WarProposalManager INSTANCE = new WarProposalManager();
 
     public static WarProposalManager get() {
@@ -16,10 +17,13 @@ public class WarProposalManager {
     }
 
     public enum ProposalType {
-        SURRENDER, TRUCE, CEASEFIRE
+        SURRENDER,
+        TRUCE,
+        CEASEFIRE
     }
 
     public static final class WarProposal {
+
         public final ProposalType type;
         public final ForgeTeam proposer;
         public final ForgeTeam target;
